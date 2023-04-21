@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DiaryMobileApp">
         <activity
+            android:name=".ui.AddToDoActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.CalendarActivity"
             android:exported="false" />
         <activity

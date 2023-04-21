@@ -3,6 +3,7 @@ package com.example.diarymobileapp.ui
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.CalendarView
 import android.widget.TextView
 import androidx.lifecycle.asLiveData
@@ -20,7 +21,6 @@ import kotlin.properties.Delegates
 class CalendarActivity : AppCompatActivity(), CalendarAdapter.Listener {
 
     lateinit var calendar: CalendarView
-    lateinit var text: TextView
     lateinit var recyclerView: RecyclerView
     private val adapter = CalendarAdapter(this)
 
@@ -44,31 +44,30 @@ class CalendarActivity : AppCompatActivity(), CalendarAdapter.Listener {
 
         val db = Db.getDb(this)
 
-        //18 april 0:33
-        val item = Item(
-            null,
-            1681778000,
-            1681865159,
-            "FirstWork",
-            "DescriptionOfFirstWork"
-        )
-
-        //18 april 6:06
-        val item2 = Item(
-            null,
-            1681798000,
-            1681885259,
-            "SecondWork",
-            "DescriptionOfSecondWork"
-        )
-
-        Thread{
-            db.getDao().insertItem(item)
-            db.getDao().insertItem(item2)
-        }.start()
+//        //18 april 0:33
+//        val item = Item(
+//            null,
+//            1681778000,
+//            1681865159,
+//            "FirstWork",
+//            "DescriptionOfFirstWork"
+//        )
+//
+//        //18 april 6:06
+//        val item2 = Item(
+//            null,
+//            1681798000,
+//            1681885259,
+//            "SecondWork",
+//            "DescriptionOfSecondWork"
+//        )
+//
+//        Thread{
+//            db.getDao().insertItem(item)
+//            db.getDao().insertItem(item2)
+//        }.start()
 
         calendar = findViewById(R.id.calendarView)
-        text = findViewById(R.id.textView)
 
         calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
 
@@ -200,6 +199,11 @@ class CalendarActivity : AppCompatActivity(), CalendarAdapter.Listener {
             putExtra("timeStart", timestampStart)
             putExtra("timeFinish", timestampFinish)
         }
+        startActivity(intent)
+    }
+
+    fun onClickAddToDo(view: View) {
+        val intent = Intent(this@CalendarActivity, AddToDoActivity::class.java)
         startActivity(intent)
     }
 }

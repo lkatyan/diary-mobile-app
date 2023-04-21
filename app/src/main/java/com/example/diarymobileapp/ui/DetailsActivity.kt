@@ -22,10 +22,16 @@ class DetailsActivity : AppCompatActivity() {
 
         val dayStart = intent.getLongExtra("timeStart", 946684800 )
         val dayFinish = intent.getLongExtra("timeFinish", 946771199)
+        var dateOfDay: Calendar = Calendar.getInstance()
 
         val hourOfToDo = intent.getStringExtra("hourOfToDo")
         binding.apply {
             textViewIntervalDetails.text = hourOfToDo
+            dateOfDay.timeInMillis = dayStart.times(1000)
+            var dateString = " ${dateOfDay.get(Calendar.DAY_OF_MONTH)}:" +
+                                "${dateOfDay.get(Calendar.MONTH)+1}:" +
+                                "${dateOfDay.get(Calendar.YEAR)}"
+            textViewDateOfDay.text = dateString
         }
 
         var dataStart: Calendar = Calendar.getInstance()
