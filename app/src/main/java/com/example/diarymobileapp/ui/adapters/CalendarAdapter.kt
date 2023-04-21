@@ -11,16 +11,19 @@ import com.example.diarymobileapp.databinding.ItemForToDoListBinding
 import com.example.diarymobileapp.models.ItemForToDoList
 import java.util.ArrayList
 
-class CalendarAdapter: RecyclerView.Adapter<CalendarAdapter.CalendarHolder>() {
+class CalendarAdapter(val listener: Listener): RecyclerView.Adapter<CalendarAdapter.CalendarHolder>() {
 
     private val itemCalendarList = ArrayList<ItemForToDoList>()
 
     class CalendarHolder(item: View): RecyclerView.ViewHolder(item) {
         private val binding = ItemForToDoListBinding.bind(item)
-        fun bind(itemList: ItemForToDoList) = with(binding) {
+
+        fun bind(itemList: ItemForToDoList, listener: Listener) = with(binding) {
             textViewInterval.text = itemList.time_interval
             textViewToDo.text = itemList.toDo
-
+            itemView.setOnClickListener {
+                listener.onClick(itemList)
+            }
         }
     }
 
@@ -30,7 +33,7 @@ class CalendarAdapter: RecyclerView.Adapter<CalendarAdapter.CalendarHolder>() {
     }
 
     override fun onBindViewHolder(holder: CalendarHolder, position: Int) {
-        holder.bind(itemCalendarList[position])
+        holder.bind(itemCalendarList[position], listener)
     }
 
     override fun getItemCount(): Int {
@@ -45,6 +48,10 @@ class CalendarAdapter: RecyclerView.Adapter<CalendarAdapter.CalendarHolder>() {
 
     fun clearAdapter() {
         itemCalendarList.clear()
+    }
+
+    interface Listener {
+        fun onClick(it: ItemForToDoList)
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.diarymobileapp.ui
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.CalendarView
@@ -16,19 +17,18 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.properties.Delegates
 
-class CalendarActivity : AppCompatActivity() {
+class CalendarActivity : AppCompatActivity(), CalendarAdapter.Listener {
 
     lateinit var calendar: CalendarView
     lateinit var text: TextView
     lateinit var recyclerView: RecyclerView
-    private val adapter = CalendarAdapter()
+    private val adapter = CalendarAdapter(this)
 
     var listItems = ArrayList<String>()
 
     var timestampStart by Delegates.notNull<Long>()
     var timestampFinish by Delegates.notNull<Long>()
     var dataStart: Calendar = Calendar.getInstance()
-    var dataFinish: Calendar = Calendar.getInstance()
     var dateOfDay: Calendar =
         Calendar
             .Builder()
@@ -48,7 +48,7 @@ class CalendarActivity : AppCompatActivity() {
         val item = Item(
             null,
             1681778000,
-            1681862300,
+            1681865159,
             "FirstWork",
             "DescriptionOfFirstWork"
         )
@@ -57,7 +57,7 @@ class CalendarActivity : AppCompatActivity() {
         val item2 = Item(
             null,
             1681798000,
-            1681864400,
+            1681885259,
             "SecondWork",
             "DescriptionOfSecondWork"
         )
@@ -91,13 +91,17 @@ class CalendarActivity : AppCompatActivity() {
                 .observe(this) { list ->
                     list.forEach {
                         dataStart.timeInMillis = it.date_start?.times(1000)!!
-                        val item = "${dataStart.get(Calendar.HOUR)}:" +
-                                "${dataStart.get(Calendar.MINUTE)} " +
-                                "${it.name} \n"
+                        var item = ""
+                        if (dataStart.get(Calendar.HOUR)<10) {
+                            item += "0${dataStart.get(Calendar.HOUR)}:"
+                        } else { item += "${dataStart.get(Calendar.HOUR)}:" }
+                        if (dataStart.get(Calendar.MINUTE)<10) {
+                            item += "0${dataStart.get(Calendar.MINUTE)} "
+                        } else { item += "${dataStart.get(Calendar.MINUTE)} " }
+                        item += "${it.name} \n"
                         listItems.add(item)
                     }
                 }
-
             init(listItems)
 
         }
@@ -142,16 +146,16 @@ class CalendarActivity : AppCompatActivity() {
             if (listItems.size > 0) {
                 var fewToDo = ""
                 when (i) {
-                    0 -> fewToDo=checkList("0")
-                    1 -> fewToDo=checkList("1")
-                    2 -> fewToDo=checkList("2")
-                    3 -> fewToDo=checkList("3")
-                    4 -> fewToDo=checkList("4")
-                    5 -> fewToDo=checkList("5")
-                    6 -> fewToDo=checkList("6")
-                    7 -> fewToDo=checkList("7")
-                    8 -> fewToDo=checkList("8")
-                    9 -> fewToDo=checkList("9")
+                    0 -> fewToDo=checkList("00")
+                    1 -> fewToDo=checkList("01")
+                    2 -> fewToDo=checkList("02")
+                    3 -> fewToDo=checkList("03")
+                    4 -> fewToDo=checkList("04")
+                    5 -> fewToDo=checkList("05")
+                    6 -> fewToDo=checkList("06")
+                    7 -> fewToDo=checkList("07")
+                    8 -> fewToDo=checkList("08")
+                    9 -> fewToDo=checkList("09")
                     10 -> fewToDo=checkList("10")
                     11 -> fewToDo=checkList("11")
                     12 -> fewToDo=checkList("12")
@@ -188,5 +192,14 @@ class CalendarActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         finishAffinity()
+    }
+
+    override fun onClick(it: ItemForToDoList) {
+        val intent = Intent(this@CalendarActivity, DetailsActivity::class.java).apply {
+            putExtra("hourOfToDo", it.time_interval)
+            putExtra("timeStart", timestampStart)
+            putExtra("timeFinish", timestampFinish)
+        }
+        startActivity(intent)
     }
 }
