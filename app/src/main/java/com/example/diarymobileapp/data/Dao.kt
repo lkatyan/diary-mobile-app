@@ -11,8 +11,8 @@ import java.sql.Timestamp
 interface Dao {
 
     @Insert
-    fun InsertItem(item: Item)
+    fun insertItem(item: Item)
 
-    @Query("SELECT * FROM items WHERE date_start > :dateStart AND date_finish < :dateFinish")
+    @Query("SELECT * FROM items WHERE date_start > :dateStart AND date_start < :dateFinish")
     fun getItems(dateStart: Long, dateFinish: Long): Flow<List<Item>>
 }

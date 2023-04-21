@@ -5,22 +5,46 @@ import android.os.Bundle
 import android.widget.CalendarView
 import android.widget.TextView
 import androidx.lifecycle.asLiveData
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.diarymobileapp.R
 import com.example.diarymobileapp.data.Db
 import com.example.diarymobileapp.models.Item
+import com.example.diarymobileapp.models.ItemForToDoList
+import com.example.diarymobileapp.ui.adapters.CalendarAdapter
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.properties.Delegates
 
 class CalendarActivity : AppCompatActivity() {
 
     lateinit var calendar: CalendarView
     lateinit var text: TextView
+    lateinit var recyclerView: RecyclerView
+    private val adapter = CalendarAdapter()
+
+    var listItems = ArrayList<String>()
+
+    var timestampStart by Delegates.notNull<Long>()
+    var timestampFinish by Delegates.notNull<Long>()
+    var dataStart: Calendar = Calendar.getInstance()
+    var dataFinish: Calendar = Calendar.getInstance()
+    var dateOfDay: Calendar =
+        Calendar
+            .Builder()
+            .build()
+    var dateOfFinishDay: Calendar =
+        Calendar
+            .Builder()
+            .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_calendar)
 
-
         val db = Db.getDb(this)
+
+        //18 april 0:33
         val item = Item(
             null,
             1681778000,
@@ -28,43 +52,137 @@ class CalendarActivity : AppCompatActivity() {
             "FirstWork",
             "DescriptionOfFirstWork"
         )
-        Thread{
-            db.getDao().InsertItem(item)
-        }.start()
 
+        //18 april 6:06
+        val item2 = Item(
+            null,
+            1681798000,
+            1681864400,
+            "SecondWork",
+            "DescriptionOfSecondWork"
+        )
+
+        Thread{
+            db.getDao().insertItem(item)
+            db.getDao().insertItem(item2)
+        }.start()
 
         calendar = findViewById(R.id.calendarView)
         text = findViewById(R.id.textView)
+
         calendar.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            var dateOfDay: Calendar =
-                Calendar
-                    .Builder()
-                    .setDate(year, month, dayOfMonth)
-                    .build()
-            var timestampStart: Long = dateOfDay.timeInMillis / 1000
-            dateOfDay.add(Calendar.HOUR, 23)
-            dateOfDay.add(Calendar.MINUTE, 59)
-            var timestampFinish: Long = dateOfDay.timeInMillis / 1000
 
-            text.text = "\n $timestampStart - $timestampFinish"
+            listItems.clear()
+            dateOfDay.clear()
+            dateOfFinishDay.clear()
 
+            dateOfDay.set(year, month, dayOfMonth)
+            timestampStart = dateOfDay.timeInMillis / 1000
+
+            dateOfFinishDay = dateOfDay
+            dateOfFinishDay.add(Calendar.HOUR, 23)
+            dateOfFinishDay.add(Calendar.MINUTE, 59)
+            timestampFinish = dateOfFinishDay.timeInMillis / 1000
+
+            // Recycler обновляется с задержкой из-за этого
             db.getDao()
                 .getItems(timestampStart, timestampFinish)
                 .asLiveData()
                 .observe(this) { list ->
-                    text.text = ""
                     list.forEach {
-                        var dataStart: Calendar = Calendar.getInstance()
                         dataStart.timeInMillis = it.date_start?.times(1000)!!
-                        var dataFinish: Calendar = Calendar.getInstance()
-                        dataFinish.timeInMillis = it.date_finish?.times(1000)!!
-                        var item = "\n ${dataStart.get(Calendar.HOUR)}: " +
+                        val item = "${dataStart.get(Calendar.HOUR)}:" +
                                 "${dataStart.get(Calendar.MINUTE)} " +
                                 "${it.name} \n"
-                        text.append(item)
+                        listItems.add(item)
                     }
                 }
+
+            init(listItems)
+
         }
+    }
+
+    private fun init(listItems: ArrayList<String>) {
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this@CalendarActivity)
+        recyclerView.adapter = adapter
+        adapter.clearAdapter()
+
+        val intervalsList = listOf(
+            "00:00 - 01:00",
+            "01:00 - 02:00",
+            "02:00 - 03:00",
+            "03:00 - 04:00",
+            "04:00 - 05:00",
+            "05:00 - 06:00",
+            "06:00 - 07:00",
+            "07:00 - 08:00",
+            "08:00 - 09:00",
+            "09:00 - 10:00",
+            "10:00 - 11:00",
+            "11:00 - 12:00",
+            "12:00 - 13:00",
+            "13:00 - 14:00",
+            "14:00 - 15:00",
+            "15:00 - 16:00",
+            "16:00 - 17:00",
+            "17:00 - 18:00",
+            "18:00 - 19:00",
+            "19:00 - 20:00",
+            "20:00 - 21:00",
+            "21:00 - 22:00",
+            "22:00 - 23:00",
+            "23:00 - 00:00"
+        )
+
+        for (i in intervalsList.indices) {
+            lateinit var it: ItemForToDoList
+
+            if (listItems.size > 0) {
+                var fewToDo = ""
+                when (i) {
+                    0 -> fewToDo=checkList("0")
+                    1 -> fewToDo=checkList("1")
+                    2 -> fewToDo=checkList("2")
+                    3 -> fewToDo=checkList("3")
+                    4 -> fewToDo=checkList("4")
+                    5 -> fewToDo=checkList("5")
+                    6 -> fewToDo=checkList("6")
+                    7 -> fewToDo=checkList("7")
+                    8 -> fewToDo=checkList("8")
+                    9 -> fewToDo=checkList("9")
+                    10 -> fewToDo=checkList("10")
+                    11 -> fewToDo=checkList("11")
+                    12 -> fewToDo=checkList("12")
+                    13 -> fewToDo=checkList("13")
+                    14 -> fewToDo=checkList("14")
+                    15 -> fewToDo=checkList("15")
+                    16 -> fewToDo=checkList("16")
+                    17 -> fewToDo=checkList("17")
+                    18 -> fewToDo=checkList("18")
+                    19 -> fewToDo=checkList("19")
+                    20 -> fewToDo=checkList("20")
+                    21 -> fewToDo=checkList("21")
+                    22 -> fewToDo=checkList("22")
+                    23 -> fewToDo=checkList("23")
+                    else -> fewToDo+=""
+                }
+                it = ItemForToDoList(intervalsList[i], fewToDo)
+            } else {
+                it = ItemForToDoList(intervalsList[i], "")
+            }
+            adapter.addItem(it)
+        }
+    }
+
+    private fun checkList(checkString: String): String {
+        var resultString = ""
+        for (j in 0 until listItems.size) {
+            val substr = listItems[j].substringBefore(':')
+            if (substr==checkString) resultString+=listItems[j]
+        }
+        return resultString
     }
 
     override fun onDestroy() {
